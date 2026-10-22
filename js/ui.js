@@ -880,6 +880,11 @@ export class UI {
   // ---------------- MARKET ----------------
   openMarket(refresh = false) {
     if (this.game.mode === 'battle') return;
+    // A refresh rebuilds the whole modal HTML, which destroys the
+    // quantity input mid-typing and drops its focus. While the player
+    // is typing in a quantity box, leave the modal alone — prices
+    // resume updating as soon as the box loses focus.
+    if (refresh && document.activeElement?.classList?.contains('trade-qty')) return;
     const g = this.game;
     const wasOpen = this.modalType === 'market';
     const keepScroll = wasOpen ? this.modalBody.scrollTop : 0;
