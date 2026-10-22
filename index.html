@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>IRONHOLD — Rise of the Warlord Merchant</title>
+<link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+<div id="app">
+  <canvas id="scene" tabindex="0"></canvas>
+  <div id="vignette"></div>
+  <div id="screen-fx"></div>
+
+  <!-- ICON SPRITE -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-gold" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="#f3c95f" stroke="#8a5a13" stroke-width="1.6"/><circle cx="12" cy="12" r="5.7" fill="none" stroke="#b57d22" stroke-width="1.2"/><path d="M12 7.6v8.8M9.6 10h4.8M9.6 14h4.8" stroke="#8a5a13" stroke-width="1.5" stroke-linecap="round"/></symbol>
+      <symbol id="i-wood" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="7" rx="3.2" fill="#a8703e" stroke="#5c3617" stroke-width="1.4"/><ellipse cx="19" cy="12.5" rx="2.1" ry="3.3" fill="#d5a466" stroke="#5c3617" stroke-width="1.2"/><path d="M8 10.5h7M6 13h8" stroke="#7d4c26" stroke-width="1.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-stone" viewBox="0 0 24 24"><path d="M5 15.5l2.4-6 5-2.5 6 3.4 1.1 5.3-5.6 3.7-6.4-.6z" fill="#a9b0b3" stroke="#4f585c" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 10l3 3.4 5-2.8M12 13.4l.6 5" stroke="#6f7a7e" stroke-width="1.2" fill="none"/></symbol>
+      <symbol id="i-food" viewBox="0 0 24 24"><path d="M12 21c-4.6 0-7.2-3.2-7.2-7.1C4.8 9 8 4.2 12 3c4 1.2 7.2 6 7.2 10.9 0 3.9-2.6 7.1-7.2 7.1z" fill="#e5b45d" stroke="#8e6122" stroke-width="1.4"/><path d="M12 6.4v12M12 10.2l3-2.2M12 13l-3-2.3M12 16l3.1-2.3" stroke="#a87728" stroke-width="1.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-iron" viewBox="0 0 24 24"><path d="M4 16.2l3.4-6.4 5.9-2.2 6.7 4-1.3 5.4-7.4 2.4z" fill="#7e8c96" stroke="#39464f" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 9.8l2.5 3.3 5.4-2.4M12.5 13.1l1 5.1" stroke="#a9bac4" stroke-width="1.2"/></symbol>
+      <symbol id="i-goods" viewBox="0 0 24 24"><path d="M4 8.5l8-4 8 4v8l-8 4-8-4z" fill="#b98b55" stroke="#5e3a1a" stroke-width="1.5" stroke-linejoin="round"/><path d="M4 8.5l8 4 8-4M12 12.5v8" stroke="#7a5128" stroke-width="1.3"/><path d="M8 6.4l8 4v4.4" stroke="#d8b586" stroke-width="1.1" fill="none"/></symbol>
+      <symbol id="i-weapons" viewBox="0 0 24 24"><path d="M4 20l9.4-9.4M17.6 3.2l3.2 3.2-2.4 6.2-6.8-6.8z" fill="#c9d2d8" stroke="#4b565e" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.2 13.6l2.2 2.2M3 21l3.2-.4.7-3.2-2.6-1z" fill="#a8773f" stroke="#5b3a19" stroke-width="1.2"/></symbol>
+      <symbol id="i-pop" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="#d8c19a" stroke="#4e3b22" stroke-width="1.4"/><path d="M5 21c.4-4.2 3.2-6.5 7-6.5s6.6 2.3 7 6.5" fill="#d8c19a" stroke="#4e3b22" stroke-width="1.4" stroke-linecap="round"/></symbol>
+      <symbol id="i-happy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="#efd583" stroke="#88651b" stroke-width="1.5"/><circle cx="9" cy="10" r="1.1" fill="#5e4715"/><circle cx="15" cy="10" r="1.1" fill="#5e4715"/><path d="M8 14.2c1 1.8 2.4 2.6 4 2.6s3-.8 4-2.6" fill="none" stroke="#5e4715" stroke-width="1.5" stroke-linecap="round"/></symbol>
+      <symbol id="i-influence" viewBox="0 0 24 24"><path d="M5 4v17M5 5h12l-2.6 4L17 13H5" fill="#c6748c" stroke="#5c2438" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 8h6" stroke="#e8b7c4" stroke-width="1.2"/></symbol>
+      <symbol id="i-hammer" viewBox="0 0 24 24"><path d="M4.5 19.5l6.2-6.2" stroke="#e6d5b0" stroke-width="2.6" stroke-linecap="round"/><path d="M10 7.4l6.6 6.6 3.9-3.9-6.6-6.6z" fill="#c8a25c" stroke="#5e4318" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.4 12.8l2.8 2.8-2 2-2.8-2.8z" fill="#a78045" stroke="#5e4318" stroke-width="1.2"/></symbol>
+      <symbol id="i-sword" viewBox="0 0 24 24"><path d="M4 20l2.2-2.2M13 4l6 6-8.4 8.4-3.9.9 1-3.9z" fill="#cdd6dc" stroke="#45525b" stroke-width="1.4" stroke-linejoin="round"/><path d="M9.5 14.5l-2-2M12.5 7l4.3 4.3" stroke="#7d8a93" stroke-width="1.1"/></symbol>
+      <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 6h8v8H3zM11 9h5l4 4v3h-2" fill="#b98b55" stroke="#523413" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="2.3" fill="#7b5a37" stroke="#3d2a17" stroke-width="1.3"/><circle cx="16.5" cy="17.5" r="2.3" fill="#7b5a37" stroke="#3d2a17" stroke-width="1.3"/></symbol>
+      <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-2.4 6 2.4 6-2.4v14l-6 2.4-6-2.4-6 2.4z" fill="#cdbd90" stroke="#4b4227" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 3.6v14M15 6v14" stroke="#8d7e55" stroke-width="1.1"/><circle cx="12" cy="11" r="1.6" fill="#a03c3c"/></symbol>
+      <symbol id="i-crown" viewBox="0 0 24 24"><path d="M4 8l4 4 4-7 4 7 4-4-2 11H6z" fill="#e1b858" stroke="#7e5714" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 16h11" stroke="#7e5714" stroke-width="1.4"/></symbol>
+      <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="#d8cbaa" stroke="#4e4632" stroke-width="1.4"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1" stroke="#d8cbaa" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-speed" viewBox="0 0 24 24"><path d="M4 17a9 9 0 1 1 16 0" fill="none" stroke="#cdbf9a" stroke-width="1.8" stroke-linecap="round"/><path d="M12 17l4.4-5.2" stroke="#e3bd67" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.6" fill="#e3bd67"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- LOADING -->
+  <div id="loading-screen">
+    <div class="load-crest">⚔</div>
+    <h1 class="load-title">IRONHOLD</h1>
+    <p class="load-sub">Rise of the Warlord Merchant</p>
+    <div class="load-bar"><div id="load-fill"></div></div>
+    <div id="load-status">Forging the valley…</div>
+    <div class="load-tip" id="load-tip">Tip: Wood and stone build an empire. Gold buys the army that keeps it.</div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div id="menu-screen">
+    <div class="menu-bg"></div>
+    <div class="menu-embers" id="menu-embers"></div>
+    <div class="menu-inner">
+      <div class="menu-crest">✦</div>
+      <h1 class="menu-title">IRONHOLD</h1>
+      <div class="menu-rule"></div>
+      <p class="menu-sub">RISE OF THE WARLORD MERCHANT</p>
+      <div class="menu-actions">
+        <button class="btn btn-gold" id="btn-continue">Continue Campaign</button>
+        <button class="btn btn-ghost" id="btn-new">New Campaign</button>
+        <div class="menu-row">
+          <button class="btn btn-small btn-ghost" id="btn-menu-settings">Settings</button>
+          <button class="btn btn-small btn-ghost" id="btn-menu-help">How to Play</button>
+        </div>
+      </div>
+      <div class="menu-foot">
+        <span>An economy. A fortress. An army.</span>
+        <span class="dot">·</span>
+        <span>Autosave enabled</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="topbar">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div class="brand-text"><b>IRONHOLD</b><span id="realm-name">The Ashen Vale</span></div>
+      </div>
+      <div class="res-strip">
+        <div class="res res-gold" id="res-gold" title="Gold — the lifeblood of your realm">
+          <svg><use href="#i-gold"/></svg><span class="rv" id="v-gold">0</span><small id="gold-rate"></small>
+        </div>
+        <div class="res" id="res-wood" title="Wood — construction and crafting">
+          <svg><use href="#i-wood"/></svg><span class="rv" id="v-wood">0</span><small id="cap-wood"></small>
+        </div>
+        <div class="res" id="res-stone" title="Stone — fortifications and upgrades">
+          <svg><use href="#i-stone"/></svg><span class="rv" id="v-stone">0</span><small id="cap-stone"></small>
+        </div>
+        <div class="res" id="res-food" title="Food — feeds your people and army">
+          <svg><use href="#i-food"/></svg><span class="rv" id="v-food">0</span><small id="cap-food"></small>
+        </div>
+        <div class="res" id="res-iron" title="Iron — weapons and industry">
+          <svg><use href="#i-iron"/></svg><span class="rv" id="v-iron">0</span><small id="cap-iron"></small>
+        </div>
+        <div class="res" id="res-goods" title="Trade goods — crafted wares for market">
+          <svg><use href="#i-goods"/></svg><span class="rv" id="v-goods">0</span><small id="cap-goods"></small>
+        </div>
+        <div class="res" id="res-weapons" title="Weapons — arm your host">
+          <svg><use href="#i-weapons"/></svg><span class="rv" id="v-weapons">0</span><small id="cap-weapons"></small>
+        </div>
+      </div>
+      <div class="status-strip">
+        <div class="stat" id="stat-pop" title="Population / housing capacity. Idle villagers pay taxes.">
+          <svg><use href="#i-pop"/></svg><span id="v-pop">0/0</span>
+        </div>
+        <div class="stat" id="stat-happy" title="Happiness — multiplies production and growth.">
+          <svg><use href="#i-happy"/></svg><span id="v-happy">0</span>
+        </div>
+        <div class="stat" id="stat-influence" title="Renown — earned as your realm grows.">
+          <svg><use href="#i-influence"/></svg><span id="v-influence">0</span>
+        </div>
+        <button class="mail-btn" id="btn-mail" title="Dispatches - letters from your people and captains">MAIL<span id="mail-badge">0</span></button>
+        <button class="save-btn" id="btn-save" title="Save campaign (Ctrl+S)">SAVE</button>
+        <div class="clock" id="clock" title="Time of day and season">
+          <span id="v-season">Spring</span><b id="v-day">Day 1</b><span id="v-hour">08:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="leftrail">
+      <button class="rail-btn" data-panel="build" title="Build (B)"><svg><use href="#i-hammer"/></svg><span>Build</span></button>
+      <button class="rail-btn" data-panel="market" title="Market (M)"><svg><use href="#i-cart"/></svg><span>Market</span></button>
+      <button class="rail-btn" data-panel="army" title="Army (T)"><svg><use href="#i-sword"/></svg><span>Army</span></button>
+      <button class="rail-btn" data-panel="realm" title="Realm (R)"><svg><use href="#i-map"/></svg><span>Realm</span></button>
+      <div class="rail-spacer"></div>
+      <button class="rail-btn" data-panel="objectives" title="Chronicle (J)"><svg><use href="#i-crown"/></svg><span>Chronicle</span></button>
+      <button class="rail-btn" data-panel="settings" title="Menu (Esc)"><svg><use href="#i-gear"/></svg><span>Menu</span></button>
+    </div>
+
+    <div id="objectives-card">
+      <div class="oc-head"><span>CHRONICLE</span><b id="objective-count">0/0</b></div>
+      <div id="objective-list"></div>
+      <div class="oc-foot" id="objective-hint">Press J for the full chronicle</div>
+    </div>
+
+    <div id="toasts"></div>
+    <div id="floating-layer"></div>
+
+    <div id="selection-card" class="hidden"></div>
+
+    <div id="minimap-wrap">
+      <canvas id="minimap" width="220" height="220"></canvas>
+      <div class="mm-label">THE ASHEN VALE</div>
+      <div class="mm-hint">Drag to pan</div>
+      <button class="mm-view" id="btn-valley" title="Toggle whole valley (F)">Valley View</button>
+    </div>
+
+    <div id="speed-controls">
+      <button class="speed-btn" data-speed="0" title="Pause (Space)"><svg><use href="#i-pause"/></svg></button>
+      <button class="speed-btn active" data-speed="1">1×</button>
+      <button class="speed-btn" data-speed="2">2×</button>
+      <button class="speed-btn" data-speed="3">4×</button>
+      <button class="speed-btn" data-speed="4">8×</button>
+    </div>
+
+    <div id="hint-bar"><span id="hint-text"></span></div>
+
+    <div id="build-panel" class="side-panel hidden">
+      <div class="panel-head">
+        <div><h2>Construction</h2><p>Raise the bones of an empire</p></div>
+        <button class="panel-close" data-close="build"><svg><use href="#i-close"/></svg></button>
+      </div>
+      <div class="build-tabs" id="build-tabs"></div>
+      <div class="build-tools"><button class="mini-btn" id="btn-upgrade-houses" data-action="upgrade-houses" title="Upgrade every cottage, longhouse, and manor you can afford (C)">Upgrade Housing <span class="keycap">C</span></button><button class="mini-btn" id="btn-upgrade-all" data-action="upgrade-all" title="Upgrade every building you can afford (U)">Upgrade All <span class="keycap">U</span></button><span>Bulk upgrades, one click</span></div>
+      <div class="build-grid" id="build-grid"></div>
+      <div class="panel-foot">Click a building, then place it on owned land. <b>R</b> rotates. <b>Esc</b> cancels.</div>
+    </div>
+
+    <div id="modal-root" class="hidden">
+      <div class="modal-back"></div>
+      <div class="modal" id="modal">
+        <div class="modal-head">
+          <div><h2 id="modal-title">Market</h2><p id="modal-sub"></p></div>
+          <button class="panel-close" id="modal-close"><svg><use href="#i-close"/></svg></button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-foot" id="modal-foot"></div>
+      </div>
+    </div>
+
+    <div id="placement-bar" class="hidden">
+      <span id="placement-name">Building</span>
+      <span class="pb-cost" id="placement-cost"></span>
+      <span class="pb-keys"><b>LMB</b> place · <b>R</b> rotate · <b>Esc</b> cancel</span>
+    </div>
+
+    <div id="tooltip" class="hidden"></div>
+
+    <!-- BATTLE HUD -->
+    <div id="battle-hud" class="hidden">
+      <div class="battle-top">
+        <div class="battle-side friendly">
+          <div class="battle-side-head"><span>YOUR HOST</span><b id="b-ally-count">0</b></div>
+          <div class="morale-track"><div id="b-ally-morale"></div></div>
+        </div>
+        <div class="battle-center">
+          <div class="battle-title" id="b-battle-title">THE BATTLE OF GREENFIELDS</div>
+          <div class="battle-obj" id="b-battle-obj">Break the enemy host</div>
+        </div>
+        <div class="battle-side enemy">
+          <div class="battle-side-head"><b id="b-enemy-count">0</b><span>ENEMY HOST</span></div>
+          <div class="morale-track"><div id="b-enemy-morale"></div></div>
+        </div>
+      </div>
+      <div class="battle-crosshair" id="battle-crosshair"><i></i><i></i></div>
+      <div class="battle-vitals">
+        <div class="vital hp"><span>HEALTH</span><div class="vital-track"><div id="b-hp"></div></div><b id="b-hp-text">180</b></div>
+        <div class="vital stam"><span>STAMINA</span><div class="vital-track"><div id="b-stam"></div></div><b id="b-stam-text">100</b></div>
+        <div class="combo" id="b-combo">COMBO ×2</div>
+      </div>
+      <div class="battle-orders">
+        <div class="orders-label">COMMAND</div>
+        <button class="order-btn active" data-order="advance"><b>1</b><span>Advance</span></button>
+        <button class="order-btn" data-order="hold"><b>2</b><span>Hold</span></button>
+        <button class="order-btn" data-order="charge"><b>3</b><span>Charge</span></button>
+        <button class="order-btn" data-order="follow"><b>4</b><span>Follow</span></button>
+        <button class="order-btn" data-order="shield"><b>5</b><span>Shieldwall</span></button>
+        <button class="order-btn rally" id="battle-rally"><b>Q</b><span>Rally</span></button>
+        <button class="order-btn power" id="battle-powershot"><b>F</b><span>Power Shot</span></button>
+        <button class="order-btn retreat" id="battle-retreat-quick"><b>R</b><span>Retreat</span></button>
+        <div class="order-note" id="b-order-note">Formation: Advance</div>
+      </div>
+      <div class="battle-feed" id="battle-feed"></div>
+      <div class="battle-objective" id="battle-objective"></div>
+      <div class="battle-help">Drag to look · Click to shoot/strike · B bow/sword · RMB block · Space dodge · Shift gallop · 1-5 orders · E volley · F power shot · Wheel zoom · T tactical view · R retreat</div>
+      <div id="battle-deploy" class="hidden">
+        <div class="deploy-card">
+          <div class="deploy-kicker">PRE-BATTLE DEPLOYMENT</div>
+          <h2>ARRAY YOUR HOST</h2>
+          <p id="battle-deploy-info">Choose how your line will meet the enemy. Then sound the advance.</p>
+          <div class="deploy-formations">
+            <button class="deploy-form active" data-formation="line"><b>LINE</b><span>Wide ranks. Best for archers and a steady advance.</span></button>
+            <button class="deploy-form" data-formation="shield"><b>SHIELDWALL</b><span>Tight ranks. Slower, but far harder to break.</span></button>
+            <button class="deploy-form" data-formation="wedge"><b>WEDGE</b><span>An arrowhead to split a gate or a packed line.</span></button>
+          </div>
+          <button class="btn btn-gold deploy-march" id="battle-march">MARCH TO BATTLE <span class="keycap">Enter</span></button>
+          <p class="deploy-hint">Your host holds until you give the order. You can still zoom the camera with the wheel.</p>
+        </div>
+      </div>
+      <div id="battle-banner" class="hidden"></div>
+      <div id="battle-pause" class="hidden">
+        <button class="btn btn-gold" id="battle-resume">Resume Battle</button>
+        <button class="btn btn-ghost" id="battle-retreat">Retreat — save your host</button>
+        <button class="btn btn-ghost" id="battle-surrender">Surrender the field</button>
+        <p>Retreat: survivors return home. You lose the field and some supplies.<br>Surrender: survivors return home, but the enemy takes a heavier price.</p>
+      </div>
+    </div>
+
+    <div id="event-modal" class="hidden"></div>
+  </div>
+</div>
+
+<div id="rotate-warning">Turn your device for the full war table.</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
