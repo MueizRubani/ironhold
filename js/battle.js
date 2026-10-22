@@ -740,6 +740,10 @@ export class Battle {
     };
     this._onKey = (e) => {
       if (!this.active) return;
+      if (this.phase === 'deploy') {
+        if (e.code === 'Enter' || e.code === 'NumpadEnter') this.beginMarch();
+        return;
+      }
       if (this.phase !== 'fighting') return;
       const k = e.code;
       if (k === 'Digit1' || k === 'F1') this._setOrder('advance');

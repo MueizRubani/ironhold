@@ -554,27 +554,27 @@ export class World {
     if (this._lastVisualT !== undefined && Math.abs(t - this._lastVisualT) < 0.015) return;
     this._lastVisualT = t;
     const hour = t;
-    const dayT = (hour - 6) / 12; // 0 at 6h, 1 at 18h
+    const dayT = (hour - 4.6) / 16.8; // 0 at 4:36, 1 at 21:24 — matches the clock's long daylight window
     const elev = Math.sin(dayT * Math.PI);
     const az = (hour / 24) * Math.PI * 2;
     this._sunDir.set(Math.cos(az) * 0.75, Math.max(-0.35, elev), Math.sin(az) * 0.55).normalize();
     const sunH = Math.max(0, elev);
-    const day = smoothstep(-0.08, 0.28, elev);
+    const day = smoothstep(-0.04, 0.16, elev);
     const night = 1 - day;
     this.nightFactor = night;
     const s = SEASONS[this.season];
     // sky colors — nights stay blue and readable, never pitch black
-    const nightTop = new THREE.Color(0x17263c), nightBot = new THREE.Color(0x31465a);
+    const nightTop = new THREE.Color(0x253650), nightBot = new THREE.Color(0x47607e);
     const dayTop = new THREE.Color(0x78a6c4), dayBot = new THREE.Color(0xe2d6ac);
     const dusk = new THREE.Color(0xe6a06a);
     const top = nightTop.clone().lerp(dayTop, day);
     const bot = nightBot.clone().lerp(dayBot, day);
-    const duskF = Math.max(0, 1 - Math.abs(elev) * 5.5) * (hour > 4 && hour < 21 ? 1 : 0.3);
+    const duskF = Math.max(0, 1 - Math.abs(elev) * 5.5) * (hour > 4 && hour < 22.5 ? 1 : 0.3);
     bot.lerp(dusk, duskF * 0.55);
     this.engine.sky.set(top, bot, this._sunDir, new THREE.Color(0xffc987), night);
     // fog
     const fogDay = new THREE.Color(s.fog);
-    const fogNight = new THREE.Color(0x3c4b5a);
+    const fogNight = new THREE.Color(0x506276);
     const fogCol = fogNight.clone().lerp(fogDay, day);
     this.engine.scene.fog.color.copy(fogCol);
     this.engine.renderer.setClearColor(fogCol);
@@ -585,11 +585,11 @@ export class World {
     const wy = Math.max(0.3, elev) * day + 0.72 * (1 - day);
     this.engine.sun.position.set(wx, wy, wz).normalize().multiplyScalar(130);
     this.engine.sun.position.add(new THREE.Vector3(0, 0, 10));
-    this.engine.sun.intensity = 0.42 + sunH * 1.9;
+    this.engine.sun.intensity = 0.6 + sunH * 1.9;
     const lightCol = new THREE.Color(0x9db7dd).lerp(new THREE.Color(0xffd9a6), day);
     lightCol.lerp(new THREE.Color(0xffb078), duskF);
     this.engine.sun.color.copy(lightCol);
-    this.engine.ambient.intensity = 0.6 + day * 0.55;
+    this.engine.ambient.intensity = 0.8 + day * 0.45;
     this.engine.ambient.color.set(0x8fa6c8).lerp(new THREE.Color(0xbcd4e6), day);
     this.engine.ambient.groundColor.set(0x454a44).lerp(new THREE.Color(0x5a5440), day);
     // windows glow

@@ -853,7 +853,7 @@ export class Game {
     }
   }
 
-  upgradeAllAffordable() {
+  upgradeAllAffordable(quiet = false) {
     const s = this.state;
     let count = 0;
     const spent = { gold: 0, wood: 0, stone: 0, food: 0, iron: 0, goods: 0, weapons: 0 };
@@ -873,17 +873,19 @@ export class Game {
       count++;
     }
     if (!count) {
-      this.ui.toast('Nothing can be upgraded with what we have right now.', 'warn');
-      this.audio.error();
+      if (!quiet) {
+        this.ui.toast('Nothing can be upgraded with what we have right now.', 'warn');
+        this.audio.error();
+      }
       return 0;
     }
     this.ui.updateTopbar(true);
     this.ui.renderBuild();
     const keep = s.buildings.find(b => b.type === 'keep');
     if (keep && this.ui.selectedBuilding && this.ui.selectedBuilding.type === 'keep') this.ui.showSelection(keep);
-    this.audio.levelup();
+    if (!quiet) this.audio.levelup();
     this.saveGame(false);
-    this.ui.toast(`<b>${count} upgrade${count > 1 ? 's' : ''}</b> completed at once. Spent ${Math.round(spent.gold)} gold and the needed materials.`, 'good');
+    if (!quiet) this.ui.toast(`<b>${count} upgrade${count > 1 ? 's' : ''}</b> completed at once. Spent ${Math.round(spent.gold)} gold and the needed materials.`, 'good');
     return count;
   }
 
@@ -1725,6 +1727,36 @@ export class Game {
       this.ui.hint(this.hintForState());
       this.checkObjectives();
       if (this.ui.modalType === 'market' && !this.ui.modalRoot.classList.contains('hidden')) this.ui.openMarket(true);
+    }
+    // Hold U: keep upgrading until everything is maxed or unaffordable.
+    // A selected building is upgraded repeatedly; with nothing selected,
+    // whole upgrade rounds run instead. Quiet — no toast/sound spam.
+    this._holdUpgT = (this._holdUpgT || 0) + rawDt;
+    const uHeld = this.mode === 'overview' && !this.placing &&
+      this.ui.modalRoot.classList.contains('hidden') &&
+      this.engine.input.keys.has('KeyU') &&
+      !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '');
+    if (!uHeld) this._holdUpgDone = false;
+    else if (!this._holdUpgDone && this._holdUpgT >= 0.28) {
+      this._holdUpgT = 0;
+      let did = 0;
+      const sel = this.ui.selectedBuilding;
+      if (sel && !sel.isCamp) {
+        const b = this.state.buildings.find(x => x.id === sel.id);
+        if (b) {
+          const max = b.type === 'keep' ? KEEP_LEVELS.length - 1 : 10;
+          const cost = b.type === 'keep'
+            ? KEEP_LEVELS[Math.min(max, b.level + 1)]?.cost
+            : this.settlement.upgradeCost(b);
+          if (b.level < max && cost && this.economy.canAfford(cost) && this.settlement.upgrade(b.id)) {
+            this.ui.updateTopbar(true);
+            did = 1;
+          }
+        }
+      } else {
+        did = this.upgradeAllAffordable(true);
+      }
+      if (!did) this._holdUpgDone = true;
     }
     this._autoT += rawDt;
     if (this._autoT > 30) {

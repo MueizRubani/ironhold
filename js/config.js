@@ -136,8 +136,8 @@ export const BUILDINGS = {
   },
   storehouse: {
     name: 'Storehouse', icon: '🏚', cat: 'civic', size: 4.4, workers: 1,
-    desc: 'Expands storage capacity by 160 for every resource. Workers reduce spoilage.',
-    cost: { wood: 35, stone: 25, gold: 60 }, unlock: 1, effect: { storage: 160 },
+    desc: 'Expands storage capacity by 320 for every resource. Workers reduce spoilage.',
+    cost: { wood: 35, stone: 25, gold: 60 }, unlock: 1, effect: { storage: 320 },
   },
   barracks: {
     name: 'Barracks', icon: '⚔️', cat: 'military', size: 5.2, workers: 1,

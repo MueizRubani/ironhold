@@ -135,6 +135,7 @@ export class UI {
       this.audio.click();
       if (a === 'worker+') this.game.settlement.assign(b.id, 1);
       else if (a === 'worker-') this.game.settlement.assign(b.id, -1);
+      else if (a === 'worker-fill') this.game.settlement.assign(b.id, 9999);
       else if (a === 'upgrade') this.game.upgradeBuilding(b);
       else if (a === 'demolish') this.game.demolishBuilding(b);
       else if (a === 'invite') this.game.inviteSettlers();
@@ -464,6 +465,7 @@ export class UI {
         <button class="wbtn" data-action="worker-" ${b.workers <= 0 ? 'disabled' : ''}>−</button>
         <div class="wbar"><i style="width:${(b.workers / wcap) * 100}%"></i></div>
         <button class="wbtn" data-action="worker+" ${b.workers >= wcap ? 'disabled' : ''}>+</button>
+        <button class="wbtn" data-action="worker-fill" ${b.workers >= wcap || this.game.settlement.idleWorkers() <= 0 ? 'disabled' : ''} title="Fill every worker slot at once (shortcut F)" style="width:auto;padding:0 9px;font-size:10px;font-weight:700;letter-spacing:.4px">FILL <span class="keycap">F</span></button>
         <span class="worker-count">${b.workers}/${wcap}</span>
       </div>
       <div style="font-size:9.5px;color:#8c7e66;margin-top:-3px;margin-bottom:6px">${this.game.settlement.idleWorkers()} idle villagers available</div>` : '';
@@ -636,6 +638,7 @@ export class UI {
       return false;
     }
     if (code === 'KeyU') { this.game.upgradeBuilding(b); return true; }
+    if (code === 'KeyF') { this.game.settlement.assign(b.id, 9999); return true; }
     if (code === 'KeyX') { this.game.demolishBuilding(b); return true; }
     if (code === 'BracketLeft') { this.game.settlement.assign(b.id, -1); return true; }
     if (code === 'BracketRight') { this.game.settlement.assign(b.id, 1); return true; }
@@ -1357,6 +1360,25 @@ export class UI {
     this.bannerTimeout = setTimeout(() => el.classList.add('hidden'), 3200);
   }
   hideBattleBanner() { $('battle-banner').classList.add('hidden'); }
+  showBattleDeploy(info) {
+    const card = $('battle-deploy');
+    if (!card) return;
+    const infoEl = $('battle-deploy-info');
+    if (infoEl && info) {
+      infoEl.textContent = `Your host: ${info.friend} warriors. The enemy fields ${info.enemy}. Choose how your line will meet them — then sound the advance.`;
+    }
+    card.querySelectorAll('.deploy-form').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.formation === (info?.formation || 'line'));
+      btn.onclick = () => {
+        card.querySelectorAll('.deploy-form').forEach(b => b.classList.toggle('active', b === btn));
+        this.game.battle?.setFormation(btn.dataset.formation);
+      };
+    });
+    const march = $('battle-march');
+    if (march) march.onclick = () => this.game.battle?.beginMarch();
+    card.classList.remove('hidden');
+  }
+  hideBattleDeploy() { $('battle-deploy')?.classList.add('hidden'); }
   battleFeed(text, bad) {
     const feed = $('battle-feed');
     if (!feed) return;
